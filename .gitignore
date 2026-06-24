@@ -1,0 +1,37 @@
+# System files
+.DS_Store
+Thumbs.db
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Python caches and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.oxlintrc.json
+
+# Node.js dependencies and builds
+node_modules/
+dist/
+build/
+
+# Local databases and uploads
+*.db
+smart_sheet.db
+uploads/
+backend/uploads/
+
+# Environment configurations and secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+backend/.env
+frontend/.env

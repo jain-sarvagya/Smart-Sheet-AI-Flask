@@ -1,0 +1,61 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  # 1. PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: smart_sheet_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: smart_sheet
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # 2. Flask Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smart_sheet_backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgrespassword@db:5432/smart_sheet
+      - FLASK_ENV=production
+      - SECRET_KEY=change_this_to_something_secure_in_production
+      - JWT_SECRET_KEY=change_this_to_something_secure_jwt_in_production
+      - UPLOAD_FOLDER=uploads
+      - MAX_CONTENT_LENGTH=104857600
+      # Inject actual API keys here when running, or rely on .env mappings
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - IMAGEKIT_PUBLIC_KEY=${IMAGEKIT_PUBLIC_KEY}
+      - IMAGEKIT_PRIVATE_KEY=${IMAGEKIT_PRIVATE_KEY}
+      - IMAGEKIT_URL_ENDPOINT=${IMAGEKIT_URL_ENDPOINT}
+    volumes:
+      - backend_uploads:/app/uploads
+    depends_on:
+      - db
+
+  # 3. React Frontend Nginx Web Server
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=/api
+    container_name: smart_sheet_frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  backend_uploads:
