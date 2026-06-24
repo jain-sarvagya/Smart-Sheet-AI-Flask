@@ -8,6 +8,11 @@ Responsibilities:
 """
 
 import os
+import sys
+
+# Ensure the backend directory is in the python path for importing modules
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from app import create_app, db
 from app.models import User, Document, Chunk, Summary, Flashcard, Quiz, ConceptExplanation, ChatMessage
 
