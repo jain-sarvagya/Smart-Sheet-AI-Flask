@@ -58,7 +58,7 @@ def explain_concept(doc_id):
     # 3. Retrieve relevant chunks using RAG retrieval (top 4 chunks)
     rag_engine = RAGEngine(
         api_key=current_app.config['GEMINI_API_KEY'],
-        chat_model=current_app.config.get('GEMINI_MODEL', 'gemini-3.1-flash-lite')
+        chat_model=current_app.config.get('GEMINI_MODEL', 'gemini-2.5-flash')
     )
     relevant_chunks = rag_engine.retrieve_context(concept_name, document.chunks, top_k=4)
     
@@ -70,7 +70,7 @@ def explain_concept(doc_id):
     # 4. Generate grounded explanation
     gemini_service = GeminiService(
         api_key=current_app.config['GEMINI_API_KEY'],
-        model_name=current_app.config.get('GEMINI_MODEL', 'gemini-3.1-flash-lite')
+        model_name=current_app.config.get('GEMINI_MODEL', 'gemini-2.5-flash')
     )
     explanation_text = gemini_service.generate_concept_explanation(concept_name, context_str)
 
