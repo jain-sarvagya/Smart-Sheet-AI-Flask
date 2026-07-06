@@ -120,7 +120,10 @@ function DocumentStudioPage() {
   // Format PDF URL if local fallback is used
   const getPdfUrl = (url) => {
     if (url.startsWith('/api/')) {
-      return `http://localhost:5000${url}`;
+      // API_URL is something like "https://some-backend.onrender.com/api" or "http://localhost:5000/api"
+      // We strip the "/api" suffix to get the host url: "https://some-backend.onrender.com"
+      const baseUrl = API_URL.endsWith('/api') ? API_URL.slice(0, -4) : API_URL.replace(/\/api\/?$/, '');
+      return `${baseUrl}${url}`;
     }
     return url;
   };

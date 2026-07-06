@@ -30,9 +30,11 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     if SQLALCHEMY_DATABASE_URI:
-        # If the URI starts with postgresql://, translate it to postgresql+pg8000://
+        # Render may provide 'postgres://' or 'postgresql://' prefix. We normalize to 'postgresql+pg8000://'.
         if SQLALCHEMY_DATABASE_URI.startswith("postgresql://"):
             SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace("postgresql://", "postgresql+pg8000://", 1)
+        elif SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
+            SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace("postgres://", "postgresql+pg8000://", 1)
     else:
         # Construct path for local SQLite db
         db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'smart_sheet.db'))
