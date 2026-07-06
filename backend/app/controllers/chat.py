@@ -52,7 +52,7 @@ def query_chatbot(doc_id):
         # 3. Retrieve chunks and generate answer via RAG
         rag_engine = RAGEngine(
             api_key=current_app.config['GEMINI_API_KEY'],
-            chat_model=current_app.config.get('GEMINI_MODEL', 'gemini-1.5-flash')
+            chat_model=current_app.config.get('GEMINI_MODEL', 'gemini-3.1-flash-lite')
         )
         answer = rag_engine.query_document(user_query, document.chunks, chat_history)
 
