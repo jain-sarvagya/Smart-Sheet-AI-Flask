@@ -118,24 +118,32 @@ class PDFProcessor:
                     chat_model=app.config.get('GEMINI_MODEL', 'gemini-3.1-flash-lite')
                 )
                 
-                for item in chunks_data:
-                    txt = item["chunk_text"]
-                    idx = item["chunk_index"]
+                # We batch chunk processing to avoid making many individual API requests
+                BATCH_SIZE = 50
+                for i in range(0, len(chunks_data), BATCH_SIZE):
+                    batch_items = chunks_data[i:i + BATCH_SIZE]
+                    batch_texts = [item["chunk_text"] for item in batch_items]
                     
-                    # Generate embedding vector for the text chunk
-                    embedding = None
+                    batch_embeddings = []
                     try:
-                        embedding = rag_engine.generate_embedding(txt)
-                    except Exception as emb_err:
-                        logger.warning(f"Failed to generate embedding for chunk {idx}: {emb_err}")
+                        # Attempt to get embeddings for the entire batch
+                        batch_embeddings = rag_engine.generate_embeddings_batch(batch_texts)
+                    except Exception as batch_err:
+                        logger.warning(f"Batch embedding generation failed: {batch_err}")
+                        batch_embeddings = [None] * len(batch_texts)
                     
-                    chunk_obj = Chunk(
-                        document_id=document_id,
-                        chunk_text=txt,
-                        chunk_index=idx,
-                        embedding=embedding
-                    )
-                    db.session.add(chunk_obj)
+                    for idx, item in enumerate(batch_items):
+                        txt = item["chunk_text"]
+                        chunk_idx = item["chunk_index"]
+                        embedding = batch_embeddings[idx] if idx < len(batch_embeddings) else None
+                        
+                        chunk_obj = Chunk(
+                            document_id=document_id,
+                            chunk_text=txt,
+                            chunk_index=chunk_idx,
+                            embedding=embedding
+                        )
+                        db.session.add(chunk_obj)
 
                 # Update document status to ready
                 document.status = 'ready'

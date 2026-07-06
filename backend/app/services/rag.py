@@ -59,6 +59,30 @@ class RAGEngine:
                     logger.error(f"Fallback embedding generation also failed: {ex}")
             return None
 
+    def generate_embeddings_batch(self, texts):
+        """
+        Calls Gemini embedding API to generate vector representations of multiple texts in a batch.
+        Returns a list of lists of floats, or Nones for failures.
+        """
+        if not self.api_key or not texts:
+            return [None] * len(texts)
+        
+        try:
+            result = genai.embed_content(
+                model=self.embedding_model,
+                content=texts,
+                task_type="retrieval_document"
+            )
+            # result['embedding'] contains a list of N vectors for N input texts
+            return result.get('embedding', [None] * len(texts))
+        except Exception as e:
+            logger.error(f"Error generating batch embeddings: {e}")
+            # Fallback to individual API calls if batching fails
+            embeddings = []
+            for txt in texts:
+                embeddings.append(self.generate_embedding(txt))
+            return embeddings
+
     def generate_query_embedding(self, text):
         """
         Generate embedding specifically optimized for search queries.
