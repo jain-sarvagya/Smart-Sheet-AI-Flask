@@ -64,7 +64,7 @@ def generate_quizzes(doc_id):
     # 4. Invoke Gemini API
     gemini_service = GeminiService(
         api_key=current_app.config['GEMINI_API_KEY'],
-        model_name=current_app.config.get('GEMINI_MODEL', 'gemini-3.1-flash-lite')
+        model_name=current_app.config.get('GEMINI_MODEL', 'gemini-1.5-flash')
     )
     current_app.logger.info(f"Triggering Gemini quiz generation for Document ID {doc_id} with count {count}")
     

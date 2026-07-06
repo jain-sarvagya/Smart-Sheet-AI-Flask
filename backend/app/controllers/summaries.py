@@ -197,7 +197,7 @@ def generate_summary(doc_id):
         api_key=current_app.config.get("GEMINI_API_KEY"),
         model_name=current_app.config.get(
             "GEMINI_MODEL",
-            "gemini-2.5-flash"
+            "gemini-1.5-flash"
         )
     )
 

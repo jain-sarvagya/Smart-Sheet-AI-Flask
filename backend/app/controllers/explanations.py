@@ -70,7 +70,7 @@ def explain_concept(doc_id):
     # 4. Generate grounded explanation
     gemini_service = GeminiService(
         api_key=current_app.config['GEMINI_API_KEY'],
-        model_name=current_app.config.get('GEMINI_MODEL', 'gemini-2.5-flash')
+        model_name=current_app.config.get('GEMINI_MODEL', 'gemini-1.5-flash')
     )
     explanation_text = gemini_service.generate_concept_explanation(concept_name, context_str)
 
