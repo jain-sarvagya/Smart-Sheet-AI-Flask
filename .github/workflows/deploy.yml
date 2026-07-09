@@ -1,0 +1,56 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Run Python Tests
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'pip'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r backend/requirements.txt
+
+    - name: Run Backend Tests
+      env:
+        PYTHONPATH: backend
+      run: |
+        pytest backend/tests
+
+  deploy:
+    name: Deploy to Render
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Trigger Backend Deployment
+      run: |
+        if [ -z "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}" ]; then
+          echo "Warning: RENDER_BACKEND_DEPLOY_HOOK is not set in GitHub secrets."
+          exit 1
+        fi
+        curl -s -X POST "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}"
+        echo "Backend deploy triggered successfully."
+
+    - name: Trigger Frontend Deployment
+      run: |
+        if [ -z "${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}" ]; then
+          echo "Warning: RENDER_FRONTEND_DEPLOY_HOOK is not set in GitHub secrets."
+          exit 1
+        fi
+        curl -s -X POST "${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}"
+        echo "Frontend deploy triggered successfully."
