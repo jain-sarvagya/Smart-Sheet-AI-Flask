@@ -41,7 +41,7 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        value: ${smart-sheet-backend.host}/api
+        value: https://smart-sheet-backend.onrender.com/api
 
 databases:
   # 3. PostgreSQL Database Instance

@@ -105,4 +105,27 @@ def create_app(config_name=None):
     def health_check():
         return jsonify({"status": "healthy", "service": "Smart-Sheet AI Backend"}), 200
 
+    # Secure debug endpoint to inspect config and environment keys
+    @app.route('/api/debug-env')
+    def debug_env():
+        key_in_env = os.environ.get('GEMINI_API_KEY')
+        key_in_config = app.config.get('GEMINI_API_KEY')
+        
+        def mask_key(key):
+            if not key:
+                return "Not Set (None or Empty)"
+            key = key.strip()
+            if len(key) <= 8:
+                return f"Set (Length: {len(key)})"
+            return f"Set: {key[:6]}...{key[-4:]} (Length: {len(key)})"
+
+        return jsonify({
+            "FLASK_ENV": os.environ.get('FLASK_ENV'),
+            "config_name": config_name,
+            "GEMINI_API_KEY_in_env": mask_key(key_in_env),
+            "GEMINI_API_KEY_in_config": mask_key(key_in_config),
+            "GEMINI_MODEL": app.config.get('GEMINI_MODEL'),
+            "all_env_keys": sorted(list(os.environ.keys()))
+        }), 200
+
     return app
